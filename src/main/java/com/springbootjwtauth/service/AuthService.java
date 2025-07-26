@@ -3,6 +3,8 @@ package com.springbootjwtauth.service;
 import com.springbootjwtauth.dto.request.LoginRequest;
 import com.springbootjwtauth.dto.request.SignupRequest;
 import com.springbootjwtauth.dto.response.LoginResponse;
+import com.springbootjwtauth.exception.CustomException;
+import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.jwt.JwtProvider;
 import com.springbootjwtauth.model.Role;
 import com.springbootjwtauth.model.User;
@@ -25,44 +27,41 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
 
-    public void signup(SignupRequest request) {
-        // 유저 중복 확인
+    public User signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
-        // 유저 생성
         User user = User.create(
                 request.getUsername(),
                 passwordEncoder.encode(request.getPassword()),
-                Role.USER // 기본 권한은 USER로 고정
+                Role.USER // 기본 권한 USER
         );
 
-        // 저장
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public LoginResponse login(LoginRequest request) {
-        // AuthenticationManager로 인증 시도
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+        }
 
-        // 인증 성공 시 SecurityContext에 등록 (필수는 아님)
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // UserDetails에서 username 가져오기
         String username = authentication.getName();
 
-        // DB에서 사용자 정보 가져오기
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // JWT 토큰 생성
-        String accessToken = jwtProvider.createAccessToken(user);
-        String refreshToken = jwtProvider.createRefreshToken(user);
+        String token = jwtProvider.createAccessToken(user);
 
-        return new LoginResponse(accessToken, refreshToken);
+        return new LoginResponse(token);
     }
+
 
 }
