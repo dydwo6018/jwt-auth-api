@@ -22,7 +22,9 @@ logging:
     org.hibernate.type: trace
 
 jwt:
-  secret: my-very-secret-key-that-is-very-long-32chars
+  secret: 4f6v9qN1sJ3xLm7Y8PlRDaWZXu0KdF+eYqZw1UbxnQ0=
+  access-token-validity: 3600000         # 1시간 (ms)
+  refresh-token-validity: 86400000       # 1일 (ms)
 
 springdoc:
   api-docs:
