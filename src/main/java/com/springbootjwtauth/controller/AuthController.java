@@ -4,11 +4,14 @@ import com.springbootjwtauth.dto.request.LoginRequest;
 import com.springbootjwtauth.dto.request.SignupRequest;
 import com.springbootjwtauth.dto.response.LoginResponse;
 import com.springbootjwtauth.dto.response.SignupResponse;
+import com.springbootjwtauth.model.User;
 import com.springbootjwtauth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -19,8 +22,14 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@RequestBody @Valid SignupRequest request) {
-        authService.signup(request);
-        return ResponseEntity.ok(new SignupResponse("회원가입 성공"));
+        User savedUser = authService.signup(request);
+
+        SignupResponse response = new SignupResponse(
+                savedUser.getUsername(),
+                List.of(new SignupResponse.RoleDto(savedUser.getRole().name()))
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
