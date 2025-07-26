@@ -1,6 +1,7 @@
 package com.springbootjwtauth.jwt;
 
 import com.springbootjwtauth.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -32,11 +33,27 @@ public class JwtProvider {
     }
 
     public String createAccessToken(User user) {
-        return createToken(user.getUsername(), accessTokenValidity);
+        Claims claims = Jwts.claims().setSubject(user.getUsername());
+        claims.put("role", user.getRole().name());  // 권한 정보 추가
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public String createRefreshToken(User user) {
-        return createToken(user.getUsername(), refreshTokenValidity);
+        Claims claims = Jwts.claims().setSubject(user.getUsername());
+        claims.put("role", user.getRole().name());  // 권한 정보 추가
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     private String createToken(String subject, long expirationMillis) {
