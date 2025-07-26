@@ -1,5 +1,7 @@
 package com.springbootjwtauth.service;
 
+import com.springbootjwtauth.exception.CustomException;
+import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.model.User;
 import com.springbootjwtauth.repository.UserRepository;
 import com.springbootjwtauth.security.CustomUserDetails;
@@ -16,9 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username){
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return new CustomUserDetails(user);
     }
 }
