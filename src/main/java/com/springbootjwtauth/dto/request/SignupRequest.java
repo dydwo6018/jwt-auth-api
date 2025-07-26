@@ -6,11 +6,10 @@ import lombok.Getter;
 @Getter
 public class SignupRequest {
 
-    @NotBlank
+    @NotBlank(message = "아이디는 필수입니다.")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 
-    private String role;
 }
