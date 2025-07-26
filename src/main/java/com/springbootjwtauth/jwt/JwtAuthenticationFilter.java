@@ -1,5 +1,7 @@
 package com.springbootjwtauth.jwt;
 
+import com.springbootjwtauth.exception.CustomException;
+import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -64,8 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (Exception e) {
-            // 유효하지 않은 토큰일 경우 필터 체인 통과만 시킴 (인증 안 됨)
-            SecurityContextHolder.clearContext();
+            // 토큰이 유효하지 않거나 만료된 경우
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         filterChain.doFilter(request, response);
