@@ -1,6 +1,8 @@
 package com.springbootjwtauth.controller;
 
+import com.springbootjwtauth.dto.request.LoginRequest;
 import com.springbootjwtauth.dto.request.SignupRequest;
+import com.springbootjwtauth.dto.response.LoginResponse;
 import com.springbootjwtauth.dto.response.SignupResponse;
 import com.springbootjwtauth.service.AuthService;
 import jakarta.validation.Valid;
@@ -20,4 +22,11 @@ public class AuthController {
         authService.signup(request);
         return ResponseEntity.ok(new SignupResponse("회원가입 성공"));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
 }
