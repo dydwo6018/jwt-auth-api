@@ -56,12 +56,4 @@ public class JwtProvider {
                 .compact();
     }
 
-    private String createToken(String subject, long expirationMillis) {
-        return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
 }
