@@ -1,5 +1,7 @@
 package com.springbootjwtauth.jwt;
 
+import com.springbootjwtauth.exception.CustomException;
+import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -54,6 +56,17 @@ public class JwtProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public void validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
     }
 
 }
