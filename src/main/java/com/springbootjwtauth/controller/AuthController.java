@@ -29,13 +29,7 @@ public class AuthController {
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "username, password로 회원가입을 수행합니다.")
     public ResponseEntity<SignupResponse> signup(@RequestBody @Valid SignupRequest request) {
-        User savedUser = authService.signup(request);
-
-        SignupResponse response = new SignupResponse(
-                savedUser.getUsername(),
-                List.of(new SignupResponse.RoleDto(savedUser.getRole().name()))
-        );
-
+        SignupResponse response = authService.signup(request);
         return ResponseEntity.ok(response);
     }
 

@@ -3,6 +3,7 @@ package com.springbootjwtauth.service;
 import com.springbootjwtauth.dto.request.LoginRequest;
 import com.springbootjwtauth.dto.request.SignupRequest;
 import com.springbootjwtauth.dto.response.LoginResponse;
+import com.springbootjwtauth.dto.response.SignupResponse;
 import com.springbootjwtauth.exception.CustomException;
 import com.springbootjwtauth.exception.ErrorCode;
 import com.springbootjwtauth.jwt.JwtProvider;
@@ -29,7 +30,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
 
-    public User signup(SignupRequest request) {
+    public SignupResponse  signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
@@ -40,7 +41,12 @@ public class AuthService {
                 Role.USER // 기본 권한 USER
         );
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return new SignupResponse(
+                user.getUsername(),
+                List.of(new SignupResponse.RoleDto(user.getRole().name()))
+        );
     }
 
     public LoginResponse login(LoginRequest request) {
