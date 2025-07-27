@@ -31,8 +31,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")  // 관리자 권한 필수 설정
+                        .requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login", "/api/v1/auth/users").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
@@ -43,7 +43,8 @@ public class SecurityConfig {
                             ErrorCode.INVALID_TOKEN.getMessage()
                     );
                     res.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    res.setCharacterEncoding("UTF-8");
+                    res.setContentType("application/json;charset=UTF-8");
                     res.getWriter().write(new ObjectMapper().writeValueAsString(body));
                 })
                 // 권한 부족 시
@@ -53,7 +54,8 @@ public class SecurityConfig {
                             ErrorCode.ACCESS_DENIED.getMessage()
                     );
                     res.setStatus(HttpStatus.FORBIDDEN.value());
-                    res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    res.setCharacterEncoding("UTF-8");
+                    res.setContentType("application/json;charset=UTF-8");
                     res.getWriter().write(new ObjectMapper().writeValueAsString(body));
                 })
         )
